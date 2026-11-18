@@ -5,11 +5,13 @@ import { LogoutButton } from "@/components/logout-button";
 import { isAuthed } from "@/lib/auth";
 import { getLocale } from "@/lib/current-locale";
 import { messages } from "@/lib/messages";
+import { publicOrigin } from "@/lib/origins";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   if (!(await isAuthed())) redirect("/admin/login");
   const locale = await getLocale();
   const text = messages[locale];
+  const siteUrl = publicOrigin();
 
   return (
     <>
@@ -20,7 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </Link>
           <nav className="admin-nav">
             <Link href="/admin">{text.adminEvents}</Link>
-            <Link href="/">{text.site}</Link>
+            <a href={siteUrl}>{text.site}</a>
             <LangSwitch locale={locale} />
             <LogoutButton locale={locale} />
           </nav>

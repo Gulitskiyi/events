@@ -4,7 +4,15 @@ import { useState } from "react";
 import type { Locale } from "@/lib/locale";
 import { messages } from "@/lib/messages";
 
-export function CopyLink({ path, locale }: { path: string; locale: Locale }) {
+export function CopyLink({
+  path,
+  locale,
+  origin,
+}: {
+  path: string;
+  locale: Locale;
+  origin?: string;
+}) {
   const text = messages[locale];
   const [done, setDone] = useState(false);
 
@@ -13,7 +21,8 @@ export function CopyLink({ path, locale }: { path: string; locale: Locale }) {
       className="btn btn-ghost"
       type="button"
       onClick={async () => {
-        await navigator.clipboard.writeText(`${location.origin}${path}`);
+        const base = (origin || location.origin).replace(/\/$/, "");
+        await navigator.clipboard.writeText(`${base}${path}`);
         setDone(true);
         window.setTimeout(() => setDone(false), 2000);
       }}

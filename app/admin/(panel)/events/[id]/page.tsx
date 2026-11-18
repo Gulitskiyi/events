@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CopyLink } from "@/components/copy-link";
 import { EventForm } from "@/components/event-form";
@@ -8,6 +7,7 @@ import { formatDateTime, toAlmatyInput } from "@/lib/format";
 import { reminderLabel } from "@/lib/labels";
 import { getLocale } from "@/lib/current-locale";
 import { countryLabel, fill, messages } from "@/lib/messages";
+import { publicOrigin, publicUrl } from "@/lib/origins";
 import { getEventById, listRegistrations } from "@/lib/store";
 
 export default async function EditEventPage({
@@ -25,6 +25,9 @@ export default async function EditEventPage({
   if (!event) notFound();
   const rows = listRegistrations(event.id);
   const report = ["sent", "saved", "failed", "skipped"].some((key) => typeof query[key] === "string");
+  const site = publicOrigin();
+  const eventPath = `/e/${event.slug}`;
+  const contractsPath = `/e/${event.slug}/contracts`;
 
   return (
     <>
@@ -32,12 +35,12 @@ export default async function EditEventPage({
         <div>
           <h1>{event.title}</h1>
           <p className="lede">
-            <Link href={`/e/${event.slug}`}>{text.openPage}</Link>
+            <a href={publicUrl(eventPath)}>{text.openPage}</a>
             {" · "}
-            <span className="path">/e/{event.slug}</span>
+            <span className="path">{eventPath}</span>
           </p>
         </div>
-        <CopyLink path={`/e/${event.slug}`} locale={locale} />
+        <CopyLink path={eventPath} locale={locale} origin={site} />
       </div>
       {report ? (
         <div className="banner ok">
@@ -70,9 +73,9 @@ export default async function EditEventPage({
         <section className="panel">
           <div className="row-between">
             <h2>{text.contractsAdminTitle}</h2>
-            <Link className="btn btn-ghost" href={`/e/${event.slug}/contracts`}>
+            <a className="btn btn-ghost" href={publicUrl(contractsPath)}>
               {text.contractsOpenBoard}
-            </Link>
+            </a>
           </div>
           <p className="note">
             {event.contracts_voting === 1 ? text.contractsVotingOn : text.contractsVotingOff}
