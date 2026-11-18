@@ -1,0 +1,18 @@
+services:
+  web:
+    build: .
+    ports:
+      - "127.0.0.1:3000:3000"
+    env_file:
+      - .env.local
+    environment:
+      HOST: 0.0.0.0
+      PORT: "3000"
+      NODE_ENV: production
+    volumes:
+      # named volume: bind-mount ./data на macOS даёт SQLite disk I/O error
+      - land_data:/app/data
+    restart: unless-stopped
+
+volumes:
+  land_data:
