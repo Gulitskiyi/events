@@ -15,6 +15,7 @@ export function parseEventInput(body: unknown): { ok: true; value: EventInput } 
   const published = Boolean(source.published);
   const contracts_enabled = Boolean(source.contractsEnabled);
   const contracts_voting = Boolean(source.contractsVoting);
+  const deadlineRaw = String(source.proposalsDeadline || "").trim();
 
   if (title.length < 2 || title.length > 200) return { ok: false, error: "errNeedTitle" };
   if (location.length < 2 || location.length > 200) return { ok: false, error: "errNeedPlace" };
@@ -38,6 +39,12 @@ export function parseEventInput(body: unknown): { ok: true; value: EventInput } 
     }
   }
 
+  let proposals_deadline: string | null = null;
+  if (deadlineRaw) {
+    proposals_deadline = fromAlmatyInput(deadlineRaw);
+    if (!proposals_deadline) return { ok: false, error: "errStart" };
+  }
+
   return {
     ok: true,
     value: {
@@ -51,6 +58,7 @@ export function parseEventInput(body: unknown): { ok: true; value: EventInput } 
       published,
       contracts_enabled,
       contracts_voting,
+      proposals_deadline,
     },
   };
 }

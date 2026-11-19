@@ -16,6 +16,7 @@ export type EventFormInitial = {
   published: boolean;
   contractsEnabled: boolean;
   contractsVoting: boolean;
+  proposalsDeadline: string;
 };
 
 const EMPTY: EventFormInitial = {
@@ -29,6 +30,7 @@ const EMPTY: EventFormInitial = {
   published: true,
   contractsEnabled: false,
   contractsVoting: false,
+  proposalsDeadline: "",
 };
 
 export function EventForm({
@@ -74,6 +76,7 @@ export function EventForm({
         published,
         contractsEnabled,
         contractsVoting,
+        proposalsDeadline: form.get("proposalsDeadline"),
       }),
     });
     const data = (await response.json()) as { ok?: boolean; error?: string; id?: string };
@@ -188,6 +191,16 @@ export function EventForm({
           <p className="note">
             {text.contractsPageNote} <span className="path">/e/{slug || "…"}/contracts</span>
           </p>
+          <div className="field">
+            <label htmlFor="proposalsDeadline">{text.proposalsDeadline}</label>
+            <input
+              id="proposalsDeadline"
+              name="proposalsDeadline"
+              type="datetime-local"
+              defaultValue={start.proposalsDeadline}
+            />
+            <p className="note">{text.proposalsDeadlineNote}</p>
+          </div>
         </>
       ) : null}
       <div className="actions">

@@ -29,6 +29,7 @@ export default async function NewEventPage() {
           published: true,
           contractsEnabled: false,
           contractsVoting: false,
+          proposalsDeadline: "",
         }}
       />
     </>

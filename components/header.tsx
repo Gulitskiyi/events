@@ -1,21 +1,18 @@
 import Link from "next/link";
-import { LangSwitch } from "@/components/lang-switch";
 import { getLocale } from "@/lib/current-locale";
 import { messages } from "@/lib/messages";
 
-export async function Header() {
+export async function Header({ voteHref }: { voteHref?: string }) {
   const locale = await getLocale();
   const text = messages[locale];
 
   return (
     <header className="top">
       <div className="wrap top-inner">
-        <Link className="brand" href="/" aria-label="ITS">
-          <img src="/logo.png" alt="ITS" />
-        </Link>
         <nav className="nav">
           <Link href="/">{text.navEvents}</Link>
-          <LangSwitch locale={locale} />
+          <Link href="/propose">{text.navPropose}</Link>
+          {voteHref ? <Link href={voteHref}>{text.navVote}</Link> : null}
         </nav>
       </div>
     </header>

@@ -1,3 +1,5 @@
+import type { ConditionOp, ContestCategory, ProposalStatus } from "./contest";
+
 export type EventRecord = {
   id: string;
   slug: string;
@@ -11,10 +13,12 @@ export type EventRecord = {
   created_at: string;
   contracts_enabled: number;
   contracts_voting: number;
+  proposals_deadline: string | null;
 };
 
 export type EventWithCount = EventRecord & {
   registration_count: number;
+  proposal_count: number;
 };
 
 export type RegistrationRecord = {
@@ -55,14 +59,50 @@ export type EventInput = {
   published: boolean;
   contracts_enabled: boolean;
   contracts_voting: boolean;
+  proposals_deadline: string | null;
 };
 
 export type ContractProposal = {
   id: string;
   event_id: string;
   registration_id: string | null;
+  number: number;
+  title: string;
+  category: ContestCategory | "";
+  asset_code: string;
+  asset_label: string;
+  event_question: string;
+  condition_op: ConditionOp | "";
+  condition_value: string;
+  settlement_at: string;
+  comment: string;
+  status: ProposalStatus;
   text: string;
+  last_name: string;
+  first_name: string;
+  company: string;
+  position: string;
+  email: string;
+  phone: string;
   created_at: string;
   votes: number;
   voted: boolean;
+};
+
+export type DirectoryCategory = ContestCategory;
+
+export type DirectoryItem = {
+  id: string;
+  category: DirectoryCategory;
+  code: string;
+  title: string;
+  search: string;
+  active: number;
+  sort_order: number;
+  created_at: string;
+};
+
+export type ContestSettings = {
+  green_list_url: string;
+  its_stocks_url: string;
 };

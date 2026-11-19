@@ -1,8 +1,18 @@
 import { randomUUID } from "node:crypto";
+import {
+  DEFAULT_REF_LINKS,
+  SETTLEMENT_DATE,
+  buildProposalSummary,
+  type ConditionOp,
+  type ContestCategory,
+  type ProposalStatus,
+} from "./contest";
 import { getDb, isUniqueError } from "./db";
-import { decryptField, encryptField, phoneKey } from "./secret";
+import { decryptField, encryptField, isSealed, phoneKey } from "./secret";
 import type {
+  ContestSettings,
   ContractProposal,
+  DirectoryItem,
   EventInput,
   EventRecord,
   EventWithCount,
@@ -22,6 +32,11 @@ function openRegistration<T extends RegistrationRecord>(row: T): T {
   };
 }
 
+function openProposalField(value: string) {
+  if (!value) return "";
+  return isSealed(value) ? decryptField(value) : value;
+}
+
 function num(value: unknown) {
   return Number(value);
 }
@@ -33,25 +48,90 @@ function asEvent(row: EventRecord | undefined | null) {
     contracts_enabled: num(row.contracts_enabled) ? 1 : 0,
     contracts_voting: num(row.contracts_voting) ? 1 : 0,
     published: num(row.published) ? 1 : 0,
+    proposals_deadline: row.proposals_deadline || null,
   } as EventRecord;
+}
+
+function mapProposal(
+  row: {
+    id: string;
+    event_id: string;
+    registration_id: string | null;
+    number: number | bigint;
+    title: string;
+    category: string;
+    asset_code: string;
+    asset_label: string;
+    event_question: string;
+    condition_op: string;
+    condition_value: string;
+    settlement_at: string;
+    comment: string;
+    status: string;
+    text: string;
+    last_name: string;
+    first_name: string;
+    company: string;
+    position: string;
+    email: string;
+    phone: string;
+    created_at: string;
+    votes?: number | bigint;
+  },
+  voted = false,
+): ContractProposal {
+  return {
+    id: row.id,
+    event_id: row.event_id,
+    registration_id: row.registration_id,
+    number: num(row.number),
+    title: row.title || row.text,
+    category: (row.category || "") as ContestCategory | "",
+    asset_code: row.asset_code || "",
+    asset_label: row.asset_label || "",
+    event_question: row.event_question || "",
+    condition_op: (row.condition_op || "") as ConditionOp | "",
+    condition_value: row.condition_value || "",
+    settlement_at: row.settlement_at || SETTLEMENT_DATE,
+    comment: row.comment || "",
+    status: (row.status || "received") as ProposalStatus,
+    text: row.text,
+    last_name: openProposalField(row.last_name || ""),
+    first_name: openProposalField(row.first_name || ""),
+    company: openProposalField(row.company || ""),
+    position: openProposalField(row.position || ""),
+    email: openProposalField(row.email || ""),
+    phone: openProposalField(row.phone || ""),
+    created_at: row.created_at,
+    votes: num(row.votes || 0),
+    voted,
+  };
 }
 
 export function listEvents() {
   const rows = getDb()
     .prepare(
-      `SELECT e.*, (SELECT COUNT(*) FROM registrations r WHERE r.event_id = e.id) AS registration_count
+      `SELECT e.*,
+              (SELECT COUNT(*) FROM registrations r WHERE r.event_id = e.id) AS registration_count,
+              (SELECT COUNT(*) FROM contract_proposals p WHERE p.event_id = e.id) AS proposal_count
        FROM events e
        ORDER BY e.starts_at ASC`,
     )
-    .all() as Array<EventRecord & { registration_count: number | bigint }>;
+    .all() as Array<EventRecord & { registration_count: number | bigint; proposal_count: number | bigint }>;
   return rows.map((row) => ({
     ...asEvent(row)!,
     registration_count: num(row.registration_count),
+    proposal_count: num(row.proposal_count),
   })) as EventWithCount[];
 }
 
 export function listPublicEvents() {
   return listEvents().filter((event) => event.published === 1);
+}
+
+export function getContestEvent() {
+  const events = listPublicEvents().filter((event) => event.contracts_enabled === 1);
+  return events[0] || listPublicEvents()[0] || null;
 }
 
 export function getEventBySlug(slug: string) {
@@ -70,8 +150,8 @@ export function createEvent(input: EventInput) {
       .prepare(
         `INSERT INTO events (
            id, slug, title, summary, description, location, starts_at, ends_at, published,
-           contracts_enabled, contracts_voting, created_at
-         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+           contracts_enabled, contracts_voting, proposals_deadline, created_at
+         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .run(
         id,
@@ -85,6 +165,7 @@ export function createEvent(input: EventInput) {
         input.published ? 1 : 0,
         input.contracts_enabled ? 1 : 0,
         input.contracts_voting ? 1 : 0,
+        input.proposals_deadline,
         new Date().toISOString(),
       );
   } catch (error) {
@@ -104,7 +185,7 @@ export function updateEvent(id: string, input: EventInput) {
       .prepare(
         `UPDATE events
          SET slug = ?, title = ?, summary = ?, description = ?, location = ?, starts_at = ?, ends_at = ?,
-             published = ?, contracts_enabled = ?, contracts_voting = ?
+             published = ?, contracts_enabled = ?, contracts_voting = ?, proposals_deadline = ?
          WHERE id = ?`,
       )
       .run(
@@ -118,6 +199,7 @@ export function updateEvent(id: string, input: EventInput) {
         input.published ? 1 : 0,
         input.contracts_enabled ? 1 : 0,
         input.contracts_voting ? 1 : 0,
+        input.proposals_deadline,
         id,
       );
   } catch (error) {
@@ -176,7 +258,10 @@ export function stats() {
         .get() as { c: number | bigint }
     ).c,
   );
-  return { events, registrations, pending };
+  const proposals = num(
+    (db.prepare("SELECT COUNT(*) AS c FROM contract_proposals").get() as { c: number | bigint }).c,
+  );
+  return { events, registrations, pending, proposals };
 }
 
 export function createRegistration(input: {
@@ -221,13 +306,43 @@ export function createRegistration(input: {
 
   const proposal = (input.contractProposal || "").trim().replace(/\s+/g, " ");
   if (proposal) {
+    const number =
+      num((db.prepare("SELECT COALESCE(MAX(number), 0) AS n FROM contract_proposals").get() as { n: number | bigint }).n) +
+      1;
     db.prepare(
-      `INSERT INTO contract_proposals (id, event_id, registration_id, text, created_at)
-       VALUES (?, ?, ?, ?, ?)`,
-    ).run(randomUUID(), input.eventId, id, proposal, new Date().toISOString());
+      `INSERT INTO contract_proposals (
+         id, event_id, registration_id, text, created_at, number, title, status
+       ) VALUES (?, ?, ?, ?, ?, ?, ?, 'received')`,
+    ).run(randomUUID(), input.eventId, id, proposal, new Date().toISOString(), number, proposal.slice(0, 120));
   }
 
   return { ok: true as const, id };
+}
+
+export function findOrCreateRegistration(input: {
+  eventId: string;
+  fullName: string;
+  company: string;
+  phone: string;
+  phoneNorm: string;
+  position: string;
+  email: string;
+  lang: string;
+}) {
+  const existingId = findRegistrationIdByPhone(input.eventId, input.phoneNorm);
+  if (existingId) return { ok: true as const, id: existingId, created: false as const };
+
+  const created = createRegistration({
+    ...input,
+    country: "kz",
+    remind: false,
+  });
+  if (!created.ok) {
+    const again = findRegistrationIdByPhone(input.eventId, input.phoneNorm);
+    if (again) return { ok: true as const, id: again, created: false as const };
+    return created;
+  }
+  return { ok: true as const, id: created.id, created: true as const };
 }
 
 export function findRegistrationIdByPhone(eventId: string, phoneNorm: string) {
@@ -245,23 +360,93 @@ export function registrationExists(id: string, eventId: string) {
   return Boolean(row);
 }
 
-export function listContractProposals(eventId: string, registrationId?: string | null): ContractProposal[] {
+export function isProposalsOpen(event: EventRecord) {
+  if (!event.proposals_deadline) return true;
+  return Date.now() <= new Date(event.proposals_deadline).getTime();
+}
+
+export function createContestProposal(input: {
+  eventId: string;
+  registrationId: string;
+  lastName: string;
+  firstName: string;
+  company: string;
+  position: string;
+  email: string;
+  phone: string;
+  title: string;
+  category: ContestCategory;
+  assetCode: string;
+  assetLabel: string;
+  eventQuestion: string;
+  conditionOp: ConditionOp;
+  conditionValue: string;
+  comment: string;
+}) {
+  const db = getDb();
+  const number =
+    num((db.prepare("SELECT COALESCE(MAX(number), 0) AS n FROM contract_proposals").get() as { n: number | bigint }).n) +
+    1;
+  const settlementAt = SETTLEMENT_DATE;
+  const text = buildProposalSummary({
+    title: input.title,
+    assetLabel: input.assetLabel,
+    eventQuestion: input.eventQuestion,
+    conditionOp: input.conditionOp,
+    conditionValue: input.conditionValue,
+    settlementAt,
+  });
+  const id = randomUUID();
+  db.prepare(
+    `INSERT INTO contract_proposals (
+       id, event_id, registration_id, text, created_at, number, title, category, asset_code, asset_label,
+       event_question, condition_op, condition_value, settlement_at, comment, status,
+       last_name, first_name, company, position, email, phone
+     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'received', ?, ?, ?, ?, ?, ?)`,
+  ).run(
+    id,
+    input.eventId,
+    input.registrationId,
+    text,
+    new Date().toISOString(),
+    number,
+    input.title,
+    input.category,
+    input.assetCode,
+    input.assetLabel,
+    input.eventQuestion,
+    input.conditionOp,
+    input.conditionValue,
+    settlementAt,
+    input.comment,
+    encryptField(input.lastName),
+    encryptField(input.firstName),
+    encryptField(input.company),
+    encryptField(input.position),
+    encryptField(input.email),
+    encryptField(input.phone),
+  );
+  return { ok: true as const, id, number };
+}
+
+function proposalSelect(where: string) {
+  return `SELECT p.*,
+            (SELECT COUNT(*) FROM contract_votes v WHERE v.proposal_id = p.id) AS votes
+     FROM contract_proposals p
+     WHERE ${where}`;
+}
+
+export function listContractProposals(
+  eventId: string,
+  registrationId?: string | null,
+  options?: { approvedOnly?: boolean },
+): ContractProposal[] {
+  const where = options?.approvedOnly
+    ? "p.event_id = ? AND p.status = 'approved'"
+    : "p.event_id = ?";
   const rows = getDb()
-    .prepare(
-      `SELECT p.id, p.event_id, p.registration_id, p.text, p.created_at,
-              (SELECT COUNT(*) FROM contract_votes v WHERE v.proposal_id = p.id) AS votes
-       FROM contract_proposals p
-       WHERE p.event_id = ?
-       ORDER BY votes DESC, p.created_at ASC`,
-    )
-    .all(eventId) as Array<{
-    id: string;
-    event_id: string;
-    registration_id: string | null;
-    text: string;
-    created_at: string;
-    votes: number | bigint;
-  }>;
+    .prepare(`${proposalSelect(where)} ORDER BY votes DESC, p.number ASC`)
+    .all(eventId) as Array<Parameters<typeof mapProposal>[0]>;
 
   let votedIds = new Set<string>();
   if (registrationId) {
@@ -274,40 +459,48 @@ export function listContractProposals(eventId: string, registrationId?: string |
     votedIds = new Set(mine.map((row) => row.proposal_id));
   }
 
-  return rows.map((row) => ({
-    id: row.id,
-    event_id: row.event_id,
-    registration_id: row.registration_id,
-    text: row.text,
-    created_at: row.created_at,
-    votes: num(row.votes),
-    voted: votedIds.has(row.id),
-  }));
+  return rows.map((row) => mapProposal(row, votedIds.has(row.id)));
+}
+
+export function listAllProposals(eventId?: string) {
+  const rows = (
+    eventId
+      ? (getDb()
+          .prepare(`${proposalSelect("p.event_id = ?")} ORDER BY p.created_at DESC`)
+          .all(eventId) as Array<Parameters<typeof mapProposal>[0]>)
+      : (getDb()
+          .prepare(`${proposalSelect("1=1")} ORDER BY p.created_at DESC`)
+          .all() as Array<Parameters<typeof mapProposal>[0]>)
+  );
+  return rows.map((row) => mapProposal(row));
 }
 
 export function getProposalById(id: string) {
-  return (
-    (getDb()
-      .prepare("SELECT id, event_id, registration_id, text, created_at FROM contract_proposals WHERE id = ?")
-      .get(id) as
-      | { id: string; event_id: string; registration_id: string | null; text: string; created_at: string }
-      | undefined) ?? null
-  );
+  const row = getDb().prepare(`${proposalSelect("p.id = ?")}`).get(id) as Parameters<typeof mapProposal>[0] | undefined;
+  return row ? mapProposal(row) : null;
+}
+
+export function updateProposalStatus(id: string, status: ProposalStatus) {
+  const result = getDb().prepare("UPDATE contract_proposals SET status = ? WHERE id = ?").run(status, id);
+  return num(result.changes) > 0;
 }
 
 export function toggleContractVote(proposalId: string, registrationId: string) {
   const db = getDb();
+  const proposal = getProposalById(proposalId);
+  if (!proposal || proposal.status !== "approved") return { ok: false as const, error: "errProposalMissing" as const };
+
   const existing = db
     .prepare("SELECT id FROM contract_votes WHERE proposal_id = ? AND registration_id = ?")
     .get(proposalId, registrationId) as { id: string } | undefined;
   if (existing) {
     db.prepare("DELETE FROM contract_votes WHERE id = ?").run(existing.id);
-    return { voted: false as const };
+    return { ok: true as const, voted: false as const };
   }
   db.prepare(
     `INSERT INTO contract_votes (id, proposal_id, registration_id, created_at) VALUES (?, ?, ?, ?)`,
   ).run(randomUUID(), proposalId, registrationId, new Date().toISOString());
-  return { voted: true as const };
+  return { ok: true as const, voted: true as const };
 }
 
 export function countContractProposals(eventId: string) {
@@ -316,6 +509,92 @@ export function countContractProposals(eventId: string) {
       c: number | bigint;
     }).c,
   );
+}
+
+export function topProposals(eventId: string, limit = 5) {
+  return listContractProposals(eventId, null, { approvedOnly: true }).slice(0, limit);
+}
+
+export function listDirectoryItems(category?: ContestCategory, activeOnly = false) {
+  const db = getDb();
+  const rows = (
+    category
+      ? activeOnly
+        ? db
+            .prepare(
+              `SELECT * FROM directory_items WHERE category = ? AND active = 1
+               ORDER BY sort_order ASC, title ASC`,
+            )
+            .all(category)
+        : db
+            .prepare(`SELECT * FROM directory_items WHERE category = ? ORDER BY sort_order ASC, title ASC`)
+            .all(category)
+      : db.prepare(`SELECT * FROM directory_items ORDER BY category ASC, sort_order ASC, title ASC`).all()
+  ) as DirectoryItem[];
+  return rows.map((row) => ({ ...row, active: num(row.active) ? 1 : 0, sort_order: num(row.sort_order) }));
+}
+
+export function createDirectoryItem(input: {
+  category: ContestCategory;
+  code: string;
+  title: string;
+  search?: string;
+  sortOrder?: number;
+}) {
+  const id = randomUUID();
+  const search = (input.search || `${input.code} ${input.title}`).toLowerCase();
+  try {
+    getDb()
+      .prepare(
+        `INSERT INTO directory_items (id, category, code, title, search, active, sort_order, created_at)
+         VALUES (?, ?, ?, ?, ?, 1, ?, ?)`,
+      )
+      .run(id, input.category, input.code, input.title, search, input.sortOrder ?? 0, new Date().toISOString());
+  } catch (error) {
+    if (isUniqueError(error)) return { ok: false as const, error: "duplicate" as const };
+    throw error;
+  }
+  return { ok: true as const, id };
+}
+
+export function updateDirectoryItem(
+  id: string,
+  input: { code: string; title: string; search?: string; active: boolean; sortOrder: number },
+) {
+  const search = (input.search || `${input.code} ${input.title}`).toLowerCase();
+  try {
+    const result = getDb()
+      .prepare(
+        `UPDATE directory_items SET code = ?, title = ?, search = ?, active = ?, sort_order = ? WHERE id = ?`,
+      )
+      .run(input.code, input.title, search, input.active ? 1 : 0, input.sortOrder, id);
+    return num(result.changes) > 0 ? ({ ok: true as const } as const) : ({ ok: false as const, error: "missing" as const });
+  } catch (error) {
+    if (isUniqueError(error)) return { ok: false as const, error: "duplicate" as const };
+    throw error;
+  }
+}
+
+export function deleteDirectoryItem(id: string) {
+  return num(getDb().prepare("DELETE FROM directory_items WHERE id = ?").run(id).changes) > 0;
+}
+
+export function getContestSettings(): ContestSettings {
+  const rows = getDb().prepare("SELECT key, value FROM contest_settings").all() as Array<{ key: string; value: string }>;
+  const map = Object.fromEntries(rows.map((row) => [row.key, row.value]));
+  return {
+    green_list_url: map.green_list_url || DEFAULT_REF_LINKS.greenList,
+    its_stocks_url: map.its_stocks_url || DEFAULT_REF_LINKS.itsStocks,
+  };
+}
+
+export function updateContestSettings(input: ContestSettings) {
+  const upsert = getDb().prepare(
+    `INSERT INTO contest_settings (key, value) VALUES (?, ?)
+     ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+  );
+  upsert.run("green_list_url", input.green_list_url);
+  upsert.run("its_stocks_url", input.its_stocks_url);
 }
 
 export function listReminderCandidates() {

@@ -33,7 +33,7 @@ export default async function ContractsPage({ params }: { params: Promise<{ slug
 
   return (
     <>
-      <Header />
+      <Header voteHref={`/e/${event.slug}/contracts`} />
       <main>
         <EventHero
           eyebrow={text.contractsTitle}
@@ -48,17 +48,19 @@ export default async function ContractsPage({ params }: { params: Promise<{ slug
             </div>
           }
         />
-        <section className="wrap section contracts-section">
-          <div className="contracts-head">
-            <div>
-              <h2 className="section-title">{text.contractsBoard}</h2>
-              <p className="lede">{text.contractsLiveHint}</p>
+        <section className="section contracts-section">
+          <div className="wrap">
+            <div className="contracts-head">
+              <div>
+                <h2 className="section-title">{text.contractsBoard}</h2>
+                <p className="lede">{text.contractsLiveHint}</p>
+              </div>
+              <Link className="btn btn-ghost" href="/propose">
+                {text.contestCta}
+              </Link>
             </div>
-            <Link className="btn btn-ghost" href={`/e/${event.slug}`}>
-              {text.contractsBackReg}
-            </Link>
+            <ContractsBoard slug={event.slug} locale={locale} votingOpen={event.contracts_voting === 1} />
           </div>
-          <ContractsBoard slug={event.slug} locale={locale} votingOpen={event.contracts_voting === 1} />
         </section>
       </main>
     </>

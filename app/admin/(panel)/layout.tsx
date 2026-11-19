@@ -22,6 +22,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </Link>
           <nav className="admin-nav">
             <Link href="/admin">{text.adminEvents}</Link>
+            <Link href="/admin/proposals">{text.adminProposals}</Link>
+            <Link href="/admin/directories">{text.adminDirectories}</Link>
             <a href={siteUrl}>{text.site}</a>
             <LangSwitch locale={locale} />
             <LogoutButton locale={locale} />

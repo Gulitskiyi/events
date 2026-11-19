@@ -48,50 +48,52 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
             </div>
           }
         />
-        <section className="wrap reg-wrap">
-          <div>
-            <p className="eyebrow">{text.participation}</p>
-            <p className="prose">{event.description || text.fallbackAbout}</p>
-            <ul className="facts">
-              <li>
-                <span>{text.when}</span>
-                <strong>
-                  {range.date}, {range.time}
-                </strong>
-              </li>
-              <li>
-                <span>{text.where}</span>
-                <strong>{event.location}</strong>
-              </li>
-            </ul>
-            {event.contracts_enabled === 1 ? (
-              <p className="contracts-cta">
-                <Link className="btn btn-ghost" href={`/e/${event.slug}/contracts`}>
-                  {text.contractsOpenBoard}
-                </Link>
-              </p>
-            ) : null}
-          </div>
-          <div className="reg-form">
-            {open ? (
-              <RegisterForm
-                eventId={event.id}
-                title={event.title}
-                locale={locale}
-                contractsEnabled={event.contracts_enabled === 1}
-                eventSlug={event.slug}
-              />
-            ) : (
-              <div className="closed-note">
-                <h2>{text.closedTitle}</h2>
-                <p>{text.closedText}</p>
-                {event.contracts_enabled === 1 ? (
-                  <p>
-                    <Link href={`/e/${event.slug}/contracts`}>{text.contractsOpenBoard}</Link>
-                  </p>
-                ) : null}
-              </div>
-            )}
+        <section className="reg-wrap">
+          <div className="wrap reg-inner">
+            <div>
+              <p className="eyebrow">{text.participation}</p>
+              <p className="prose">{event.description || text.fallbackAbout}</p>
+              <ul className="facts">
+                <li>
+                  <span>{text.when}</span>
+                  <strong>
+                    {range.date}, {range.time}
+                  </strong>
+                </li>
+                <li>
+                  <span>{text.where}</span>
+                  <strong>{event.location}</strong>
+                </li>
+              </ul>
+              {event.contracts_enabled === 1 ? (
+                <p className="contracts-cta">
+                  <Link className="btn btn-ghost" href={`/e/${event.slug}/contracts`}>
+                    {text.contractsOpenBoard}
+                  </Link>
+                </p>
+              ) : null}
+            </div>
+            <div className="reg-form">
+              {open ? (
+                <RegisterForm
+                  eventId={event.id}
+                  title={event.title}
+                  locale={locale}
+                  contractsEnabled={event.contracts_enabled === 1}
+                  eventSlug={event.slug}
+                />
+              ) : (
+                <div className="closed-note">
+                  <h2>{text.closedTitle}</h2>
+                  <p>{text.closedText}</p>
+                  {event.contracts_enabled === 1 ? (
+                    <p>
+                      <Link href={`/e/${event.slug}/contracts`}>{text.contractsOpenBoard}</Link>
+                    </p>
+                  ) : null}
+                </div>
+              )}
+            </div>
           </div>
         </section>
       </main>

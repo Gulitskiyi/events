@@ -6,7 +6,11 @@ import { fill, messages } from "@/lib/messages";
 
 type Proposal = {
   id: string;
+  number?: number;
+  title?: string;
   text: string;
+  assetLabel?: string;
+  eventQuestion?: string;
   votes: number;
   voted: boolean;
   createdAt: string;
@@ -26,6 +30,7 @@ export function ContractsBoard({
   const [votingOpen, setVotingOpen] = useState(initialVoting);
   const [unlocked, setUnlocked] = useState(false);
   const [totalVotes, setTotalVotes] = useState(0);
+  const [topIds, setTopIds] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [pendingId, setPendingId] = useState("");
   const [unlocking, setUnlocking] = useState(false);
@@ -35,11 +40,13 @@ export function ContractsBoard({
       votingOpen?: boolean;
       unlocked?: boolean;
       totalVotes?: number;
+      topIds?: string[];
       proposals?: Proposal[];
     }) => {
       if (typeof data.votingOpen === "boolean") setVotingOpen(data.votingOpen);
       if (typeof data.unlocked === "boolean") setUnlocked(data.unlocked);
       if (typeof data.totalVotes === "number") setTotalVotes(data.totalVotes);
+      if (Array.isArray(data.topIds)) setTopIds(data.topIds);
       if (Array.isArray(data.proposals)) setProposals(data.proposals);
     },
     [],
@@ -54,6 +61,7 @@ export function ContractsBoard({
         votingOpen?: boolean;
         unlocked?: boolean;
         totalVotes?: number;
+        topIds?: string[];
         proposals?: Proposal[];
       };
       if (!response.ok || !data.ok) {
@@ -98,6 +106,7 @@ export function ContractsBoard({
         votingOpen?: boolean;
         unlocked?: boolean;
         totalVotes?: number;
+        topIds?: string[];
         proposals?: Proposal[];
       };
       if (!response.ok || !data.ok) {
@@ -127,6 +136,7 @@ export function ContractsBoard({
         error?: string;
         unlocked?: boolean;
         totalVotes?: number;
+        topIds?: string[];
         proposals?: Proposal[];
       };
       if (!response.ok || !data.ok) {
@@ -185,16 +195,24 @@ export function ContractsBoard({
       {votingOpen && unlocked ? <p className="note">{text.contractsUnlocked}</p> : null}
 
       {proposals.length === 0 ? (
-        <p className="empty">{text.contractsEmpty}</p>
+        <p className="empty">{text.contractsEmptyApproved}</p>
       ) : (
         <ol className="contracts-list">
           {proposals.map((row, index) => {
             const share = Math.round((row.votes / maxVotes) * 100);
+            const inTop = topIds.includes(row.id);
             return (
               <li className="contract-card" key={row.id}>
                 <div className="contract-rank">{index + 1}</div>
                 <div className="contract-body">
-                  <p>{row.text}</p>
+                  <div className="contract-title-row">
+                    <strong>
+                      #{row.number || index + 1} {row.title || row.text}
+                    </strong>
+                    {inTop ? <span className="badge badge-on">{text.topFive}</span> : null}
+                  </div>
+                  {row.assetLabel ? <p className="muted">{row.assetLabel}</p> : null}
+                  {row.eventQuestion ? <p>{row.eventQuestion}</p> : <p>{row.text}</p>}
                   <div className="contract-bar" aria-hidden="true">
                     <span style={{ width: `${share}%` }} />
                   </div>

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CopyLink } from "@/components/copy-link";
 import { EventForm } from "@/components/event-form";
@@ -67,15 +68,21 @@ export default async function EditEventPage({
           published: event.published === 1,
           contractsEnabled: event.contracts_enabled === 1,
           contractsVoting: event.contracts_voting === 1,
+          proposalsDeadline: event.proposals_deadline ? toAlmatyInput(event.proposals_deadline) : "",
         }}
       />
       {event.contracts_enabled === 1 ? (
         <section className="panel">
           <div className="row-between">
             <h2>{text.contractsAdminTitle}</h2>
-            <a className="btn btn-ghost" href={publicUrl(contractsPath)}>
-              {text.contractsOpenBoard}
-            </a>
+            <div className="actions">
+              <Link className="btn btn-ghost" href={`/admin/proposals?event=${event.id}`}>
+                {text.adminProposals}
+              </Link>
+              <a className="btn btn-ghost" href={publicUrl(contractsPath)}>
+                {text.contractsOpenBoard}
+              </a>
+            </div>
           </div>
           <p className="note">
             {event.contracts_voting === 1 ? text.contractsVotingOn : text.contractsVotingOff}

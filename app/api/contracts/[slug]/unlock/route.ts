@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getLocale } from "@/lib/current-locale";
 import { errorText } from "@/lib/messages";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
-import { findRegistrationIdByPhone, getEventBySlug, listContractProposals } from "@/lib/store";
+import { findRegistrationIdByPhone, getEventBySlug, listContractProposals, topProposals } from "@/lib/store";
 import { BALLOT_COOKIE, ballotCookieOptions, createBallotToken } from "@/lib/voter";
 
 export async function POST(request: Request, { params }: { params: Promise<{ slug: string }> }) {
@@ -27,16 +27,22 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
   const registrationId = findRegistrationIdByPhone(event.id, phoneNorm);
   if (!registrationId) return fail(404, "errVoterNotRegistered");
 
-  const proposals = listContractProposals(event.id, registrationId);
+  const proposals = listContractProposals(event.id, registrationId, { approvedOnly: true });
   const totalVotes = proposals.reduce((sum, row) => sum + row.votes, 0);
   const response = NextResponse.json({
     ok: true,
     unlocked: true,
     votingOpen: true,
     totalVotes,
+    topIds: topProposals(event.id, 5).map((row) => row.id),
     proposals: proposals.map((row) => ({
       id: row.id,
+      number: row.number,
+      title: row.title,
       text: row.text,
+      category: row.category,
+      assetLabel: row.asset_label,
+      eventQuestion: row.event_question,
       votes: row.votes,
       voted: row.voted,
       createdAt: row.created_at,

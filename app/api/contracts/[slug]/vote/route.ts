@@ -8,6 +8,7 @@ import {
   listContractProposals,
   registrationExists,
   toggleContractVote,
+  topProposals,
 } from "@/lib/store";
 import { readBallot } from "@/lib/voter";
 
@@ -34,19 +35,29 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
   if (!proposalId) return fail(400, "errBadData");
 
   const proposal = getProposalById(proposalId);
-  if (!proposal || proposal.event_id !== event.id) return fail(404, "errProposalMissing");
+  if (!proposal || proposal.event_id !== event.id || proposal.status !== "approved") {
+    return fail(404, "errProposalMissing");
+  }
 
   const result = toggleContractVote(proposalId, ballot.registrationId);
-  const proposals = listContractProposals(event.id, ballot.registrationId);
+  if (!result.ok) return fail(400, result.error);
+
+  const proposals = listContractProposals(event.id, ballot.registrationId, { approvedOnly: true });
   const totalVotes = proposals.reduce((sum, row) => sum + row.votes, 0);
   return NextResponse.json({
     ok: true,
     unlocked: true,
     voted: result.voted,
     totalVotes,
+    topIds: topProposals(event.id, 5).map((row) => row.id),
     proposals: proposals.map((row) => ({
       id: row.id,
+      number: row.number,
+      title: row.title,
       text: row.text,
+      category: row.category,
+      assetLabel: row.asset_label,
+      eventQuestion: row.event_question,
       votes: row.votes,
       voted: row.voted,
       createdAt: row.created_at,

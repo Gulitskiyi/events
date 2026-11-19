@@ -42,7 +42,9 @@ button, input, select, textarea { font: inherit; }
 .top-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 36px;
+  flex-wrap: wrap;
   min-height: 84px;
 }
 .brand {
@@ -55,11 +57,11 @@ button, input, select, textarea { font: inherit; }
   height: 44px;
   width: auto;
 }
-.nav { display: flex; align-items: center; gap: 28px; }
+.nav { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
 .nav a {
   text-decoration: none;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   letter-spacing: 0.15em;
   text-transform: uppercase;
 }
@@ -78,31 +80,46 @@ button, input, select, textarea { font: inherit; }
 }
 .langs button[aria-pressed="true"] { opacity: 1; }
 
-.hero {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  min-height: 78vh;
-  color: white;
-  background:
-    linear-gradient(90deg, rgba(4, 8, 18, 0.72) 0%, rgba(4, 8, 18, 0.28) 48%, rgba(4, 8, 18, 0.12) 100%),
-    linear-gradient(180deg, rgba(4, 8, 18, 0.28), transparent 28%, rgba(4, 8, 18, 0.4)),
-    url("/astana.jpg") right center / cover no-repeat;
-  overflow: hidden;
+.hero-media {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  width: 100%;
+  overflow: visible;
+  background: #9a0a12;
+  line-height: 0;
+  text-align: center;
+  padding: 8px 8px 12px;
 }
-.hero-inner { position: relative; z-index: 1; padding: 132px 0 48px; }
-.hero h1 {
+.hero-banner {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  margin-inline: auto;
+  display: block;
+  object-fit: contain;
+  object-position: center center;
+  vertical-align: bottom;
+}
+.hero-below {
+  position: relative;
+  z-index: 1;
+  color: white;
+  background: #050505;
+}
+.hero-inner { padding: 28px 0 8px; }
+.hero-below h1 {
   margin: 0;
-  max-width: min(14em, 100%);
-  font-size: clamp(46px, 6.4vw, 92px);
-  line-height: 0.92;
+  max-width: min(18em, 100%);
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1.05;
   letter-spacing: -0.04em;
   font-weight: 700;
   overflow-wrap: anywhere;
 }
 .eyebrow {
-  margin: 0 0 16px;
+  margin: 0 0 12px;
   color: var(--coral);
   font-size: 12px;
   font-weight: 600;
@@ -111,9 +128,9 @@ button, input, select, textarea { font: inherit; }
 }
 .hero-summary {
   max-width: 40rem;
-  margin: 22px 0 0;
+  margin: 12px 0 0;
   color: rgba(255, 255, 255, 0.78);
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1.55;
 }
 .infobar { position: relative; z-index: 1; background: #050505; }
@@ -147,11 +164,16 @@ button, input, select, textarea { font: inherit; }
 }
 
 .points {
+  position: relative;
+  z-index: 1;
+  padding: 36px 0;
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+}
+.points-inner {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
-  padding: 36px 0;
-  border-bottom: 1px solid var(--line);
 }
 .points span, .facts span, .field label, .section-title, .stat span {
   display: block;
@@ -163,7 +185,12 @@ button, input, select, textarea { font: inherit; }
 }
 .points strong { display: block; margin-top: 8px; font-size: 22px; font-weight: 600; letter-spacing: -0.03em; }
 
-.section { padding: 28px 0 72px; }
+.section {
+  position: relative;
+  z-index: 1;
+  padding: 28px 0 72px;
+  background: var(--paper);
+}
 .section-title { margin: 28px 0 0; }
 .event-row {
   display: grid;
@@ -181,10 +208,15 @@ button, input, select, textarea { font: inherit; }
 .muted { color: var(--muted); }
 
 .reg-wrap {
+  position: relative;
+  z-index: 1;
+  padding: 72px 0 96px;
+  background: var(--paper);
+}
+.reg-inner {
   display: grid;
   grid-template-columns: 1fr minmax(280px, 440px);
   gap: 72px;
-  padding: 72px 0 96px;
 }
 .prose { margin: 0; font-size: 17px; line-height: 1.65; white-space: pre-wrap; }
 .facts { margin: 32px 0 0; padding: 0; list-style: none; }
@@ -238,13 +270,13 @@ button, input, select, textarea { font: inherit; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
-  padding: 14px 18px;
+  min-height: 52px;
+  padding: 16px 22px;
   border: 0;
   background: var(--coral);
   color: white;
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   text-decoration: none;
@@ -284,9 +316,11 @@ button, input, select, textarea { font: inherit; }
   display: grid;
   min-height: 100vh;
   place-items: center;
-  background:
-    linear-gradient(180deg, rgba(4, 8, 18, 0.55), rgba(4, 8, 18, 0.45)),
-    url("/astana.jpg") right center / cover no-repeat;
+  background-color: #050505;
+  background-image: url("/astana.jpg");
+  background-position: center top;
+  background-size: cover;
+  background-repeat: no-repeat;
   padding: 120px 20px 48px;
 }
 .login-card {
@@ -302,7 +336,7 @@ button, input, select, textarea { font: inherit; }
 .adminbar { background: var(--night); color: white; }
 .adminbar-inner { display: flex; align-items: center; justify-content: space-between; min-height: 72px; }
 .adminbar a { color: white; text-decoration: none; }
-.admin-nav { display: flex; align-items: center; gap: 22px; }
+.admin-nav { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .admin-nav button {
   padding: 0;
   border: 0;
@@ -368,10 +402,65 @@ button, input, select, textarea { font: inherit; }
 .note { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
 .path { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
 .stack { display: flex; flex-direction: column; gap: 10px; }
-.miss { min-height: 70vh; display: grid; place-items: center; color: white; text-align: center; }
+.miss {
+  display: flex;
+  flex-direction: column;
+  min-height: 70vh;
+  color: white;
+  text-align: center;
+  background: #050505;
+}
+.miss-copy {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 48px 20px;
+  background: #050505;
+}
 .miss h1 { margin: 0 0 8px; font-size: 64px; letter-spacing: -0.04em; }
 .miss p { margin: 0 0 20px; color: rgba(255,255,255,.72); }
 
+.how-list {
+  margin: 18px 0 0;
+  padding: 0 0 0 1.2em;
+  display: grid;
+  gap: 14px;
+  max-width: 46rem;
+  font-size: 17px;
+  line-height: 1.55;
+}
+.how-list.plain { list-style: disc; }
+.refs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 22px;
+}
+.refs-grid article {
+  padding: 22px 20px;
+  border-top: 1px solid var(--line);
+}
+.refs-grid h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+  letter-spacing: -0.03em;
+}
+.refs-grid .btn { margin-top: 16px; }
+.refs-side {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+.asset-select {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  background: white;
+}
 .contracts-cta { margin: 22px 0 0; }
 .contracts-section { padding-bottom: 72px; }
 .contracts-head {
@@ -474,16 +563,28 @@ button, input, select, textarea { font: inherit; }
   justify-content: space-between;
   gap: 12px;
 }
+.contract-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.contract-title-row strong {
+  font-size: 18px;
+  letter-spacing: -0.03em;
+}
 
 @media (max-width: 860px) {
-  .points, .stats, .grid-2, .reg-wrap, .event-row, .facts li, .contracts-meta { grid-template-columns: 1fr; }
+  .points-inner, .stats, .grid-2, .reg-inner, .event-row, .facts li, .contracts-meta, .refs-grid { grid-template-columns: 1fr; }
   .contracts-head { align-items: flex-start; flex-direction: column; }
-  .reg-wrap { gap: 28px; padding: 40px 0 64px; }
+  .reg-wrap { padding: 40px 0 64px; }
+  .reg-inner { gap: 28px; }
   .reg-form { order: -1; }
   .event-row { gap: 8px; }
   .infobar-inner, .admin-head, .row-between { align-items: flex-start; flex-direction: column; }
   .infobar-time, .infobar-tz { text-align: left; }
-  .hero h1 { font-size: 44px; }
-  .hero-inner { padding-top: 112px; }
+  .hero-below h1 { font-size: 28px; }
+  .hero-inner { padding-top: 22px; }
   .admin-main h1 { font-size: 32px; }
 }
