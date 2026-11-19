@@ -4,8 +4,8 @@ const next = require("next");
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.HOST || "127.0.0.1";
-const publicPort = Number(process.env.PORT || 3000);
-const adminPort = Number(process.env.ADMIN_PORT || 3001);
+const publicPort = Number(process.env.PORT || 4000);
+const adminPort = Number(process.env.ADMIN_PORT || 4001);
 
 if (!Number.isFinite(publicPort) || publicPort <= 0) throw new Error("Invalid PORT");
 if (!Number.isFinite(adminPort) || adminPort <= 0) throw new Error("Invalid ADMIN_PORT");

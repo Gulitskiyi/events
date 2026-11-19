@@ -2,16 +2,16 @@ services:
   web:
     build: .
     ports:
-      - "127.0.0.1:3000:3000"
-      - "127.0.0.1:3001:3001"
+      - "127.0.0.1:4000:4000"
+      - "127.0.0.1:4001:4001"
     env_file:
       - .env.local
     environment:
       HOST: 0.0.0.0
-      PORT: "3000"
-      ADMIN_PORT: "3001"
-      PUBLIC_ORIGIN: "http://127.0.0.1:3000"
-      ADMIN_ORIGIN: "http://127.0.0.1:3001"
+      PORT: "4000"
+      ADMIN_PORT: "4001"
+      PUBLIC_ORIGIN: "http://127.0.0.1:4000"
+      ADMIN_ORIGIN: "http://127.0.0.1:4001"
       NODE_ENV: production
     volumes:
       # named volume: bind-mount ./data на macOS даёт SQLite disk I/O error
