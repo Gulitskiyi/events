@@ -273,7 +273,7 @@ export function ProposalForm({
         </label>
         <textarea id="eventQuestion" name="eventQuestion" required placeholder={text.eventQuestionPh} />
       </div>
-      <div className="grid-2">
+      <div className="grid-2 condition-row">
         <div className="field">
           <label htmlFor="conditionOp">
             {text.condition} <span className="req">*</span>

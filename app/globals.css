@@ -400,11 +400,13 @@ body:has(.top-solid) .badge {
 .req { color: var(--coral); }
 .field input, .field select, .field textarea {
   width: 100%;
+  min-height: 52px;
   padding: 14px;
   border: 1px solid transparent;
   border-radius: 0;
   background: var(--fog);
   color: var(--ink);
+  line-height: 1.25;
 }
 .field textarea { min-height: 120px; resize: vertical; }
 .field select {
@@ -532,7 +534,24 @@ body:has(.top-solid) .badge {
 .panel h2 { margin: 0; font-size: 22px; letter-spacing: -0.03em; }
 .banner { margin-bottom: 18px; padding: 14px 16px; background: #fff4f1; border: 1px solid #ffd0c4; }
 .banner.ok { background: #f3fff6; border-color: #b7e4c7; }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+.grid-2 .field {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin-bottom: 0;
+}
+.grid-2 .field label {
+  min-height: 2.75em;
+  display: flex;
+  align-items: flex-end;
+}
 .table-scroll { overflow-x: auto; background: white; border: 1px solid var(--line); }
 .table { width: 100%; min-width: 860px; border-collapse: collapse; font-size: 14px; }
 .table th {
