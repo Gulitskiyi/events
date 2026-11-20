@@ -146,20 +146,36 @@ body:has(.top-solid) .field input,
 body:has(.top-solid) .field select,
 body:has(.top-solid) .field textarea,
 body:has(.top-solid) .asset-select {
-  background: rgba(255, 255, 255, 0.08);
-  color: white;
-  border-color: transparent;
+  background: #ffffff;
+  color: #141414;
+  border: 1px solid transparent;
+  color-scheme: light;
 }
 body:has(.top-solid) .field input:focus,
 body:has(.top-solid) .field select:focus,
-body:has(.top-solid) .field textarea:focus {
+body:has(.top-solid) .field textarea:focus,
+body:has(.top-solid) .asset-select:focus {
   border-color: var(--coral);
-  background: rgba(255, 255, 255, 0.12);
+  background: #ffffff;
+  color: #141414;
 }
-body:has(.top-solid) .field select {
-  background-image: linear-gradient(45deg, transparent 50%, #fff 50%), linear-gradient(135deg, #fff 50%, transparent 50%);
+body:has(.top-solid) .field select,
+body:has(.top-solid) .asset-select {
+  background-color: #ffffff;
+  background-image: linear-gradient(45deg, transparent 50%, #111 50%), linear-gradient(135deg, #111 50%, transparent 50%);
+  background-position: calc(100% - 18px) 55%, calc(100% - 12px) 55%;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
 }
-body:has(.top-solid) ::placeholder { color: rgba(255, 255, 255, 0.35); }
+body:has(.top-solid) .field select option,
+body:has(.top-solid) .asset-select option {
+  background: #ffffff;
+  color: #141414;
+}
+body:has(.top-solid) .field input::placeholder,
+body:has(.top-solid) .field textarea::placeholder {
+  color: #8d8d8d;
+}
 body:has(.top-solid) .btn-ghost {
   color: white;
   border-color: rgba(255, 255, 255, 0.55);
@@ -204,6 +220,9 @@ body:has(.top-solid) .badge {
   display: block;
   height: 44px;
   width: auto;
+}
+.top-solid .brand img {
+  filter: brightness(0) invert(1);
 }
 .nav { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
 .nav a {

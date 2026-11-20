@@ -11,10 +11,16 @@ export async function Header({
 }) {
   const locale = await getLocale();
   const text = messages[locale];
+  const showLogo = variant === "solid";
 
   return (
     <header className={variant === "overlay" ? "top top-overlay" : "top top-solid"}>
       <div className="wrap top-inner">
+        {showLogo ? (
+          <Link className="brand" href="/" aria-label="ITS">
+            <img src="/logo.png" alt="ITS" />
+          </Link>
+        ) : null}
         <nav className="nav">
           <Link href="/">{text.navEvents}</Link>
           <Link href="/propose">{text.navPropose}</Link>
