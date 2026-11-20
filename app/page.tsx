@@ -15,9 +15,10 @@ export default async function HomePage() {
 
   return (
     <>
-      <Header voteHref={voteHref} />
+      <Header voteHref={voteHref} variant="overlay" />
       <main>
         <EventHero
+          banner
           eyebrow={text.contestEyebrow}
           title={text.contestTitle}
           summary={text.contestLead}

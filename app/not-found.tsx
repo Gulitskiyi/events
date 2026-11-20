@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Header } from "@/components/header";
 import { getLocale } from "@/lib/current-locale";
@@ -9,18 +8,7 @@ export default async function NotFound() {
   return (
     <>
       <Header />
-      <main className="miss">
-        <div className="hero-media" aria-hidden="true">
-          <Image
-            src="/astana.jpg"
-            alt=""
-            width={1920}
-            height={1080}
-            sizes="100vw"
-            quality={92}
-            className="hero-banner"
-          />
-        </div>
+      <main className="miss miss-plain">
         <div className="miss-copy">
           <p className="eyebrow">404</p>
           <h1>{text.notFoundTitle}</h1>

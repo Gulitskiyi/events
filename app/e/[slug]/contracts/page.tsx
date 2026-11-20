@@ -42,9 +42,9 @@ export default async function ContractsPage({ params }: { params: Promise<{ slug
           date={range.date}
           place={event.location}
           side={
-            <div>
-              <div className="infobar-time">{count}</div>
-              <div className="infobar-tz">{text.contractsTotal}</div>
+            <div className="page-head-stat">
+              <strong>{count}</strong>
+              <span>{text.contractsTotal}</span>
             </div>
           }
         />

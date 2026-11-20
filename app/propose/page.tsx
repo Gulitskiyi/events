@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { EventHero } from "@/components/event-hero";
 import { Header } from "@/components/header";
 import { ProposalForm } from "@/components/proposal-form";
 import { getLocale } from "@/lib/current-locale";
@@ -18,14 +17,15 @@ export default async function ProposePage() {
     <>
       <Header voteHref={voteHref} />
       <main>
-        <EventHero eyebrow={text.contestEyebrow} title={text.contestCta} summary={text.proposeLead} />
-        <div className="reg-wrap">
+        <div className="reg-wrap reg-wrap-focus">
           <div className="wrap reg-inner">
             <div>
-              <p className="eyebrow">{text.refsTitle}</p>
-              <h2 className="form-title" style={{ fontSize: 28 }}>
-                {text.category}
-              </h2>
+              <p className="eyebrow">{text.contestEyebrow}</p>
+              <h1 className="form-title">{text.contestCta}</h1>
+              <p className="lede">{text.proposeLead}</p>
+              <p className="eyebrow" style={{ marginTop: 28 }}>
+                {text.refsTitle}
+              </p>
               <ul className="how-list plain">
                 <li>{text.categoryBanks}</li>
                 <li>{text.categoryStocks}</li>

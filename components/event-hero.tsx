@@ -8,6 +8,7 @@ export function EventHero({
   date,
   place,
   side,
+  banner = false,
 }: {
   eyebrow: string;
   title: string;
@@ -15,7 +16,29 @@ export function EventHero({
   date?: string;
   place?: string;
   side?: ReactNode;
+  banner?: boolean;
 }) {
+  if (!banner) {
+    return (
+      <section className="page-head">
+        <div className="wrap page-head-inner">
+          <div>
+            <p className="eyebrow">{eyebrow}</p>
+            <h1>{title}</h1>
+            {summary ? <p className="page-head-summary">{summary}</p> : null}
+            {date ? (
+              <p className="page-head-meta">
+                {date}
+                {place ? ` · ${place}` : ""}
+              </p>
+            ) : null}
+          </div>
+          {side ? <div className="page-head-side">{side}</div> : null}
+        </div>
+      </section>
+    );
+  }
+
   return (
     <>
       <div className="hero-media">
@@ -36,11 +59,11 @@ export function EventHero({
           <h1>{title}</h1>
           {summary ? <p className="hero-summary">{summary}</p> : null}
         </div>
-        {date ? (
+        {date || side ? (
           <div className="infobar">
             <div className="wrap infobar-inner">
               <div>
-                <div className="infobar-date">{date}</div>
+                {date ? <div className="infobar-date">{date}</div> : null}
                 {place ? <div className="infobar-place">{place}</div> : null}
               </div>
               {side ? <div>{side}</div> : null}

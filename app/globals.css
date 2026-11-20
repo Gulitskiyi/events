@@ -32,12 +32,20 @@ button, input, select, textarea { font: inherit; }
 }
 
 .top {
-  position: absolute;
   z-index: 5;
-  top: 0;
   left: 0;
   right: 0;
+}
+.top-overlay {
+  position: absolute;
+  top: 0;
   color: white;
+}
+.top-solid {
+  position: relative;
+  color: var(--ink);
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
 }
 .top-inner {
   display: flex;
@@ -47,6 +55,65 @@ button, input, select, textarea { font: inherit; }
   flex-wrap: wrap;
   min-height: 84px;
 }
+.page-head {
+  position: relative;
+  z-index: 1;
+  padding: 28px 0 8px;
+  background: var(--paper);
+}
+.page-head-inner {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+.page-head h1 {
+  margin: 0;
+  max-width: min(22em, 100%);
+  font-size: clamp(28px, 4vw, 40px);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  font-weight: 700;
+}
+.page-head-summary {
+  max-width: 40rem;
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.55;
+}
+.page-head-meta {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+.page-head-side { flex: none; }
+.page-head-stat {
+  text-align: right;
+}
+.page-head-stat strong {
+  display: block;
+  font-size: 32px;
+  letter-spacing: -0.04em;
+}
+.page-head-stat span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.reg-wrap-focus { padding-top: 24px; }
+.miss-plain {
+  background: var(--paper);
+  color: var(--ink);
+}
+.miss-plain .miss-copy {
+  background: var(--paper);
+}
+.miss-plain p { color: var(--muted); }
 .brand {
   display: inline-flex;
   align-items: center;
@@ -577,8 +644,10 @@ button, input, select, textarea { font: inherit; }
 
 @media (max-width: 860px) {
   .points-inner, .stats, .grid-2, .reg-inner, .event-row, .facts li, .contracts-meta, .refs-grid { grid-template-columns: 1fr; }
-  .contracts-head { align-items: flex-start; flex-direction: column; }
+  .contracts-head, .page-head-inner { align-items: flex-start; flex-direction: column; }
+  .page-head-stat { text-align: left; }
   .reg-wrap { padding: 40px 0 64px; }
+  .reg-wrap-focus { padding-top: 12px; }
   .reg-inner { gap: 28px; }
   .reg-form { order: -1; }
   .event-row { gap: 8px; }

@@ -39,16 +39,10 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
           eyebrow={text.register}
           title={event.title}
           summary={event.summary}
-          date={range.date}
+          date={`${range.date}, ${range.time}`}
           place={event.location}
-          side={
-            <div>
-              <div className="infobar-time">{range.time}</div>
-              <div className="infobar-tz">{text.astanaTime}</div>
-            </div>
-          }
         />
-        <section className="reg-wrap">
+        <section className="reg-wrap reg-wrap-focus">
           <div className="wrap reg-inner">
             <div>
               <p className="eyebrow">{text.participation}</p>
