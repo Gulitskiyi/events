@@ -150,6 +150,12 @@ function seedSettings(db: DatabaseSync) {
   db.prepare(
     `UPDATE contest_settings SET value = ? WHERE key = 'its_stocks_url' AND value LIKE '%its.kz%'`,
   ).run(DEFAULT_REF_LINKS.itsStocks);
+  db.prepare(
+    `UPDATE contest_settings
+     SET value = ?
+     WHERE key = 'green_list_url'
+       AND (value LIKE '%afsa.kz%' OR value = '' OR value IS NULL)`,
+  ).run(DEFAULT_REF_LINKS.greenList);
 }
 
 function migrate(db: DatabaseSync) {

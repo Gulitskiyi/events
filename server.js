@@ -25,6 +25,7 @@ function routeKind(pathname) {
     pathname === "/favicon.ico" ||
     pathname === "/logo.png" ||
     pathname === "/astana.jpg" ||
+    pathname === "/afsa-green-list.pdf" ||
     pathname === "/icon.png" ||
     pathname.startsWith("/icon")
   ) {

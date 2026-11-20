@@ -11,7 +11,7 @@ export const CONDITION_OPS = ["above", "below", "equal", "at_or_above", "at_or_b
 export type ConditionOp = (typeof CONDITION_OPS)[number];
 
 export const DEFAULT_REF_LINKS = {
-  greenList: "https://afsa.kz/en/green-list",
+  greenList: "/afsa-green-list.pdf",
   itsStocks: "https://itsx.kz",
 } as const;
 
