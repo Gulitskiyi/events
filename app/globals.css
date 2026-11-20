@@ -43,9 +43,9 @@ button, input, select, textarea { font: inherit; }
 }
 .top-solid {
   position: relative;
-  color: var(--ink);
-  background: var(--paper);
-  border-bottom: 1px solid var(--line);
+  color: white;
+  background: #050505;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 .top-inner {
   display: flex;
@@ -59,7 +59,8 @@ button, input, select, textarea { font: inherit; }
   position: relative;
   z-index: 1;
   padding: 28px 0 8px;
-  background: var(--paper);
+  color: white;
+  background: #050505;
 }
 .page-head-inner {
   display: flex;
@@ -78,13 +79,13 @@ button, input, select, textarea { font: inherit; }
 .page-head-summary {
   max-width: 40rem;
   margin: 12px 0 0;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.72);
   font-size: 16px;
   line-height: 1.55;
 }
 .page-head-meta {
   margin: 12px 0 0;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.55);
   font-size: 14px;
   font-weight: 600;
 }
@@ -99,7 +100,7 @@ button, input, select, textarea { font: inherit; }
 }
 .page-head-stat span {
   display: block;
-  color: var(--muted);
+  color: rgba(255, 255, 255, 0.55);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.12em;
@@ -107,13 +108,93 @@ button, input, select, textarea { font: inherit; }
 }
 .reg-wrap-focus { padding-top: 24px; }
 .miss-plain {
-  background: var(--paper);
-  color: var(--ink);
+  background: #050505;
+  color: white;
 }
 .miss-plain .miss-copy {
-  background: var(--paper);
+  background: #050505;
 }
-.miss-plain p { color: var(--muted); }
+.miss-plain p { color: rgba(255, 255, 255, 0.72); }
+
+/* Inner pages (solid header): keep black/red brand surface */
+body:has(.top-solid) {
+  color: white;
+  background:
+    radial-gradient(ellipse 90% 55% at 50% -15%, rgba(181, 14, 24, 0.42), transparent 58%),
+    #050505;
+}
+body:has(.top-solid) .reg-wrap,
+body:has(.top-solid) .section,
+body:has(.top-solid) .contracts-section {
+  background: transparent;
+}
+body:has(.top-solid) .lede,
+body:has(.top-solid) .muted,
+body:has(.top-solid) .hint,
+body:has(.top-solid) .note,
+body:has(.top-solid) .prose,
+body:has(.top-solid) .how-list {
+  color: rgba(255, 255, 255, 0.72);
+}
+body:has(.top-solid) .field label,
+body:has(.top-solid) .section-title,
+body:has(.top-solid) .points span,
+body:has(.top-solid) .facts span {
+  color: rgba(255, 255, 255, 0.45);
+}
+body:has(.top-solid) .field input,
+body:has(.top-solid) .field select,
+body:has(.top-solid) .field textarea,
+body:has(.top-solid) .asset-select {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  border-color: transparent;
+}
+body:has(.top-solid) .field input:focus,
+body:has(.top-solid) .field select:focus,
+body:has(.top-solid) .field textarea:focus {
+  border-color: var(--coral);
+  background: rgba(255, 255, 255, 0.12);
+}
+body:has(.top-solid) .field select {
+  background-image: linear-gradient(45deg, transparent 50%, #fff 50%), linear-gradient(135deg, #fff 50%, transparent 50%);
+}
+body:has(.top-solid) ::placeholder { color: rgba(255, 255, 255, 0.35); }
+body:has(.top-solid) .btn-ghost {
+  color: white;
+  border-color: rgba(255, 255, 255, 0.55);
+}
+body:has(.top-solid) .btn-ghost:hover {
+  background: white;
+  color: #050505;
+}
+body:has(.top-solid) .contracts-meta > div,
+body:has(.top-solid) .contracts-unlock,
+body:has(.top-solid) .contract-card {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+body:has(.top-solid) .contracts-meta span,
+body:has(.top-solid) .contract-rank {
+  color: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.06);
+}
+body:has(.top-solid) .contract-bar { background: rgba(255, 255, 255, 0.12); }
+body:has(.top-solid) .contracts-wait {
+  background: rgba(252, 59, 32, 0.12);
+  border-color: rgba(252, 59, 32, 0.45);
+  color: white;
+}
+body:has(.top-solid) .facts li { border-top-color: rgba(255, 255, 255, 0.12); }
+body:has(.top-solid) .closed-note p,
+body:has(.top-solid) .success p { color: rgba(255, 255, 255, 0.72); }
+body:has(.top-solid) .form-error { color: #ff8a7a; }
+body:has(.top-solid) .empty { color: rgba(255, 255, 255, 0.55); }
+body:has(.top-solid) .badge {
+  color: white;
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+}
 .brand {
   display: inline-flex;
   align-items: center;
